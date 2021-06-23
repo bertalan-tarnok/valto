@@ -1,20 +1,24 @@
 {
   "name": "valto",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A compiler for components",
   "scripts": {
     "build": "tsc && tsc -p tsconfig.strip.json",
     "dev": "tsc"
   },
-  "author": "bertalan-tarnok",
-  "license": "MIT",
-  "type": "commonjs",
   "files": [
     "/valto.js",
     "/valto.d.ts"
   ],
   "main": "valto.js",
   "types": "valto.d.ts",
+  "type": "commonjs",
+  "license": "MIT",
+  "author": "bertalan-tarnok",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bertalan-tarnok/valto"
+  },
   "devDependencies": {
     "@types/jsdom": "^16.2.11",
     "typescript": "^4.3.4"

@@ -1,6 +1,6 @@
 # Valto
 
-A brief description of what this project does and who it's for
+A compiler for components
 
 ## Installation
 
