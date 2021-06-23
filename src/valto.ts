@@ -2,7 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import { JSDOM } from 'jsdom';
 
-
 // config
 // TODO: config file
 export const src = path.join(process.cwd(), 'src');
