@@ -1,15 +1,17 @@
 {
   "name": "valto",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A compiler for components",
   "scripts": {
     "build": "tsc && tsc -p tsconfig.strip.json",
-    "dev": "tsc",
+    "dev": "tsc -w",
     "prepublish": "npm run build"
   },
   "files": [
     "/valto.js",
-    "/valto.d.ts"
+    "/valto.d.ts",
+    "/server.js",
+    "/server.d.ts"
   ],
   "main": "valto.js",
   "types": "valto.d.ts",

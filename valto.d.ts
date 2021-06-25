@@ -1,18 +1,28 @@
-export declare const src: string;
-export declare const dist: string;
-export declare const stringToDOM: (s: string) => HTMLElement[];
+import { JSDOM } from 'jsdom';
 /**
- * Import a html file as `HTMLElement[]`
+ * Gets the DOM of the html file
  * @param pathToFile Path relative to `src`
  */
-export declare const useHTML: (pathToFile: string) => HTMLElement[];
+export declare const getDOM: (pathToFile: string) => JSDOM;
 /**
+ * Gets the `window` of the html file
  * @param pathToFile Path relative to `src`
  */
-export declare const useCSS: (pathToFile: string) => string;
-export declare type Component = {
-    html: HTMLElement[];
-    css?: string;
-};
-export declare type Route = [Component, string];
-export declare const useRoutes: (routes: Route[]) => void;
+export declare const getWindow: (pathToFile: string) => import("jsdom").DOMWindow;
+/**
+ * Gets the `document` of the html file
+ * @param pathToFile Path relative to `src`
+ */
+export declare const getDocument: (pathToFile: string) => Document;
+export declare const stringToDOM: (s: string) => Element[];
+/**
+ * Imports a html file as an `Element`
+ * @param pathToFile Path relative to `src`
+ */
+export declare const useHTML: (pathToFile: string) => HTMLElement;
+export declare type Route = [Element, string];
+/**
+ * Creates the html files for every route in `routes[]`
+ * @param baseFilePath Path relative to `src`
+ */
+export declare const useRoutes: (routes: Route[], baseDOM?: JSDOM) => void;

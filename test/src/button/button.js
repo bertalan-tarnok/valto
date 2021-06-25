@@ -1,9 +1,11 @@
-import { useHTML, useCSS } from 'valto';
+import { useHTML } from 'valto';
 
-export const button = (href = '/', text = '') => {
+export const button = (text = 'BUTTON', href = '/') => {
   const html = useHTML('button/button.html');
+  const a = html.querySelector('a');
 
-  html[0].href = href;
-  html[0].textContent = text;
-  return { html, css: useCSS('button/button.css') };
+  a.href = href;
+  a.textContent = text;
+
+  return html;
 };

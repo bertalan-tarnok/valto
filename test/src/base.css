@@ -1,0 +1,34 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Lexend:wght@400;500;600;700&display=swap');
+
+:root {
+  font-size: 62.5%;
+
+  --color-text: #333333;
+  --color-dark: #5f5f5f;
+  --color-light: #f5f5f5;
+  --color-background: #ffffff;
+  --color-accent: #ffbf80;
+
+  --font: 'Lexend', sans-serif;
+  --font-mono: 'Jetbrains Mono', monospace;
+
+  --font-size-small: 1.2rem;
+  --font-size-big: 3.6rem;
+
+  --padding-small: 1rem;
+  --padding-normal: 2rem;
+  --padding-big: 4.8rem;
+  --padding-large: 10rem;
+
+  --border-radius: 0.8rem;
+
+  --transition: 200ms ease;
+}
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}

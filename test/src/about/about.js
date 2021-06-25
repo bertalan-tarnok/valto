@@ -1,6 +1,10 @@
-import { useHTML, useCSS } from 'valto';
+import { useHTML } from 'valto';
+import { button } from '../button/button.js';
 
-export const about = () => ({
-  html: [...useHTML('about/about.html')],
-  css: useCSS('about/about.css'),
-});
+export const about = () => {
+  const html = useHTML('about/about.html');
+  const btn = html.querySelector('btn');
+  btn.replaceWith(button(btn.textContent));
+
+  return html;
+};
