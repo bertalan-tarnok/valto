@@ -35,13 +35,15 @@ const useHTML = (pathToFile) => {
 };
 exports.useHTML = useHTML;
 // TODO: css with routes
-const useCSS = (path) => {
-    const file = fs_1.default.readFileSync(path).toString();
-    const style = document.createElement('style');
-    style.textContent += file;
-    document.head.append(style);
+/**
+ * @param pathToFile Path relative to `src`
+ */
+const useCSS = (pathToFile) => {
+    const file = fs_1.default.readFileSync(path_1.default.join(exports.src, pathToFile)).toString();
+    return file;
 };
 exports.useCSS = useCSS;
+// const components: Component[] = [];
 const render = (element, root = document.body) => {
     root.append(...element);
 };
@@ -52,7 +54,13 @@ const useRoutes = (routes) => {
     }
     for (const route of routes) {
         const localDom = new jsdom_1.JSDOM(base);
-        render(route[0], localDom.window.document.body);
+        render(route[0].html, localDom.window.document.body);
+        if (route[0].css) {
+            // const style = stringToDOM(route[0].css);
+            const style = localDom.window.document.createElement('style');
+            style.textContent = route[0].css;
+            render([style], localDom.window.document.head);
+        }
         fs_1.default.mkdirSync(path_1.default.join(exports.dist, route[1]), { recursive: true });
         const minimizedHTML = localDom.serialize().replace(/(>\s+<)/g, '><');
         fs_1.default.writeFileSync(path_1.default.join(exports.dist, route[1], 'index.html'), minimizedHTML);

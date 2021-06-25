@@ -1,4 +1,3 @@
-import fs from 'fs';
 export declare const src: string;
 export declare const dist: string;
 export declare const stringToDOM: (s: string) => HTMLElement[];
@@ -7,6 +6,13 @@ export declare const stringToDOM: (s: string) => HTMLElement[];
  * @param pathToFile Path relative to `src`
  */
 export declare const useHTML: (pathToFile: string) => HTMLElement[];
-export declare const useCSS: (path: fs.PathLike) => void;
-export declare type Route = [Element[], string];
+/**
+ * @param pathToFile Path relative to `src`
+ */
+export declare const useCSS: (pathToFile: string) => string;
+export declare type Component = {
+    html: HTMLElement[];
+    css?: string;
+};
+export declare type Route = [Component, string];
 export declare const useRoutes: (routes: Route[]) => void;

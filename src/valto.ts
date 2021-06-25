@@ -34,20 +34,28 @@ export const useHTML = (pathToFile: string): HTMLElement[] => {
 };
 
 // TODO: css with routes
-export const useCSS = (path: fs.PathLike) => {
-  const file = fs.readFileSync(path).toString();
-  const style = document.createElement('style');
 
-  style.textContent += file;
-
-  document.head.append(style);
+/**
+ * @param pathToFile Path relative to `src`
+ */
+export const useCSS = (pathToFile: string) => {
+  const file = fs.readFileSync(path.join(src, pathToFile)).toString();
+  return file;
 };
+
+export type Component = {
+  html: HTMLElement[];
+  css?: string;
+  // TODO: js / ts support
+};
+
+// const components: Component[] = [];
 
 const render = (element: Element[], root: HTMLElement = document.body) => {
   root.append(...element);
 };
 
-export type Route = [Element[], string];
+export type Route = [Component, string];
 
 export const useRoutes = (routes: Route[]) => {
   fs.mkdirSync(dist, { recursive: true });
@@ -59,12 +67,19 @@ export const useRoutes = (routes: Route[]) => {
   for (const route of routes) {
     const localDom = new JSDOM(base);
 
-    render(route[0], localDom.window.document.body);
+    render(route[0].html, localDom.window.document.body);
+
+    if (route[0].css) {
+      // const style = stringToDOM(route[0].css);
+      const style = localDom.window.document.createElement('style');
+      style.textContent = route[0].css;
+
+      render([style], localDom.window.document.head);
+    }
 
     fs.mkdirSync(path.join(dist, route[1]), { recursive: true });
 
     const minimizedHTML = localDom.serialize().replace(/(>\s+<)/g, '><');
     fs.writeFileSync(path.join(dist, route[1], 'index.html'), minimizedHTML);
   }
-
 };

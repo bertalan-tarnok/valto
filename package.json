@@ -4,7 +4,8 @@
   "description": "A compiler for components",
   "scripts": {
     "build": "tsc && tsc -p tsconfig.strip.json",
-    "dev": "tsc"
+    "dev": "tsc",
+    "prepublish": "npm run build"
   },
   "files": [
     "/valto.js",
@@ -19,6 +20,11 @@
     "type": "git",
     "url": "https://github.com/bertalan-tarnok/valto"
   },
+  "keywords": [
+    "front-end",
+    "ui",
+    "html"
+  ],
   "devDependencies": {
     "@types/jsdom": "^16.2.11",
     "typescript": "^4.3.4"

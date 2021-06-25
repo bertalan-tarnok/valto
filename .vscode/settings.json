@@ -1,0 +1,24 @@
+{
+  "restoreTerminals.terminals": [
+    {
+      "splitTerminals": [
+        {
+          "name": "valto",
+          "commands": ["npm run dev"]
+        }
+      ]
+    },
+    {
+      "splitTerminals": [
+        {
+          "name": "test",
+          "commands": ["cd test"]
+        }
+      ]
+    }
+  ],
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/package-lock.json": true
+  }
+}

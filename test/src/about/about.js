@@ -1,3 +1,6 @@
-import { useHTML } from 'valto';
+import { useHTML, useCSS } from 'valto';
 
-export const about = useHTML('about/about.html');
+export const about = () => ({
+  html: [...useHTML('about/about.html')],
+  css: useCSS('about/about.css'),
+});
