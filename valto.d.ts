@@ -1,4 +1,7 @@
 import { JSDOM } from 'jsdom';
+export declare const src: string;
+export declare const dist: string;
+export declare const dev = true;
 /**
  * Gets the DOM of the html file
  * @param pathToFile Path relative to `src`

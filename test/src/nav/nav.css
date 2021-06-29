@@ -1,0 +1,10 @@
+nav {
+  padding: var(--padding-big) var(--padding-large);
+  display: flex;
+  justify-content: flex-end;
+}
+
+nav a {
+  margin: 0 var(--padding-small);
+  font-weight: 500;
+}

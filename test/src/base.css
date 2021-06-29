@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Lexend:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
   font-size: 62.5%;
@@ -8,17 +8,18 @@
   --color-light: #f5f5f5;
   --color-background: #ffffff;
   --color-accent: #ffbf80;
+  --color-accent-dark: #f2b679;
 
-  --font: 'Lexend', sans-serif;
+  --font: 'Inter', sans-serif;
   --font-mono: 'Jetbrains Mono', monospace;
 
-  --font-size-small: 1.2rem;
-  --font-size-big: 3.6rem;
+  --font-size-small: 2rem;
+  --font-size-big: 6rem;
 
-  --padding-small: 1rem;
-  --padding-normal: 2rem;
-  --padding-big: 4.8rem;
-  --padding-large: 10rem;
+  --padding-small: 1.5rem;
+  --padding-normal: 3rem;
+  --padding-big: 6rem;
+  --padding-large: 16rem;
 
   --border-radius: 0.8rem;
 
@@ -31,4 +32,28 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+body,
+html {
+  background-color: var(--color-background);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+a,
+ul,
+ol,
+li,
+button {
+  font-size: var(--font-size-small);
+  font-family: var(--font);
+  color: var(--color-text);
+  text-decoration: none;
+  font-weight: normal;
 }

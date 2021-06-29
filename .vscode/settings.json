@@ -22,5 +22,6 @@
     "**/package-lock.json": true
   },
   "todo-tree.tree.showBadges": true,
-  "todo-tree.tree.showCountsInTree": false
+  "todo-tree.tree.showCountsInTree": false,
+  "cssVariables.lookupFiles": ["./test/src/base.css"]
 }

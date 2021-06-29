@@ -1,3 +1,20 @@
+.home {
+  padding: 0 var(--padding-large);
+  display: grid;
+}
+
 h1 {
   font-size: var(--font-size-big);
+  font-weight: 500;
+  padding: var(--padding-big) 0;
+}
+
+p {
+  width: 40ch;
+  color: var(--color-dark);
+  padding-bottom: var(--padding-large);
+}
+
+.cta .btn:first-of-type {
+  margin-right: var(--padding-normal);
 }

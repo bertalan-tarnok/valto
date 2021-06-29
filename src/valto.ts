@@ -2,17 +2,15 @@ import fs from 'fs';
 import path from 'path';
 import { JSDOM } from 'jsdom';
 
-// TODO: Websocket dev server
-//  https://nodejs.org/en/knowledge/HTTP/servers/how-to-serve-static-files/
-
 // config
 // TODO: config file
-const src = path.join(process.cwd(), 'src');
-const dist = path.join(process.cwd(), 'build');
+export const src = path.join(process.cwd(), 'src');
+export const dist = path.join(process.cwd(), 'build');
 
-// document setup
-const base = fs.readFileSync(path.join(src, 'base.html'));
-const dom = new JSDOM(base);
+export const dev = true;
+
+// document setup);
+const dom = new JSDOM('');
 
 const { window } = dom;
 const { document } = window;
@@ -53,14 +51,16 @@ export const stringToDOM = (s: string) => {
  * @param pathToFile Path relative to `src`
  */
 export const useHTML = (pathToFile: string) => {
-  const doc = getDocument(pathToFile);
-  const children = doc.body.children;
-  const wrapper = doc.createElement('valto-wrapper');
+  const html = stringToDOM(fs.readFileSync(path.join(src, pathToFile)).toString());
+
+  const wrapper = document.createElement('valto-wrapper');
 
   // store the path for later (css stuff)
-  const valtoPath = doc.createElement('valto-path');
+  const valtoPath = document.createElement('valto-path');
   valtoPath.setAttribute('href', path.join(src, pathToFile));
-  wrapper.append(valtoPath, ...children);
+
+  wrapper.append(valtoPath, ...html);
+
   return wrapper;
 };
 
@@ -83,12 +83,18 @@ export const useRoutes = (routes: Route[], baseDOM = dom) => {
     fs.rmSync(path.join(dist, file), { recursive: true });
   }
 
+  const usedCSSFiles: string[] = [];
+
   const replaceWithCSS = (pathToCSS: string, style: HTMLStyleElement) => {
+    if (usedCSSFiles.includes(pathToCSS)) return;
+
     const css = fs.readFileSync(pathToCSS).toString();
+    usedCSSFiles.push(pathToCSS);
     style.textContent += css.replace(/((?<={)|(?<=})|(?<=;)|(?<=,))\s+/g, '');
   };
 
   for (const route of routes) {
+    usedCSSFiles.length = 0;
     // dom of the route
     const localDom = new JSDOM(baseDOM.serialize());
     const localDoc = localDom.window.document;
@@ -114,14 +120,17 @@ export const useRoutes = (routes: Route[], baseDOM = dom) => {
       const htmlPath = wrapper.querySelector('valto-path')!.getAttribute('href')!;
 
       // css links
-      const styleLinks = Array.from(
-        wrapper.querySelectorAll('link[rel="stylesheet"]')
-      ) as HTMLLinkElement[];
+      for (const child of Array.from(wrapper.childNodes) as HTMLElement[]) {
+        if (child?.tagName?.toLowerCase() !== 'link') continue;
 
-      for (const link of styleLinks) {
-        replaceWithCSS(path.join(htmlPath, '../', link.href), style);
-        link.remove();
+        const link = child as HTMLLinkElement;
+        if (link?.href && link?.rel === 'stylesheet') {
+          replaceWithCSS(path.join(htmlPath, '../', link.href), style);
+          link.remove();
+        }
       }
+
+      // TODO: img
 
       // remove valto related stuff
       wrapper.querySelector('valto-path')!.remove();
@@ -129,6 +138,12 @@ export const useRoutes = (routes: Route[], baseDOM = dom) => {
     }
 
     render(style, localDoc.head);
+
+    if (dev) {
+      const script = localDoc.createElement('script');
+      script.textContent = fs.readFileSync(path.join(__dirname, 'dev.js')).toString();
+      render(script, localDoc.head);
+    }
 
     fs.mkdirSync(path.join(dist, route[1]), { recursive: true });
 
