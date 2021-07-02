@@ -5,7 +5,8 @@
   "main": "src/base.js",
   "scripts": {
     "build": "node .",
-    "dev": "nodemon . -e * --ignore build"
+    "dev": "nodemon . -e * --ignore build",
+    "serve": "valto-serve"
   },
   "author": "",
   "license": "ISC",

@@ -1,0 +1,41 @@
+form {
+  display: grid;
+  grid-auto-rows: auto;
+  gap: var(--padding-normal);
+  width: 40rem;
+}
+
+form div {
+  display: grid;
+  gap: var(--padding-small);
+  width: 100%;
+}
+
+form label {
+  font-weight: 500;
+  color: var(--color-mid);
+}
+
+form input {
+  padding: calc(var(--padding-small) - 0.4rem);
+  background-color: var(--color-background);
+  width: 100%;
+  border: none;
+  transition: all var(--transition);
+  border: 0.4rem dashed var(--color-light);
+}
+
+form input:focus {
+  outline: none;
+  background-color: var(--color-light);
+}
+
+form input::selection {
+  background-color: var(--color-text);
+  color: var(--color-light);
+}
+
+form .btn {
+  width: 100%;
+  margin-top: var(--padding-normal);
+}

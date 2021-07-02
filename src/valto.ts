@@ -6,6 +6,7 @@ import { JSDOM } from 'jsdom';
 // TODO: config file
 export const src = path.join(process.cwd(), 'src');
 export const dist = path.join(process.cwd(), 'build');
+export const publicFolder = path.join(process.cwd(), 'public');
 
 export const dev = true;
 
@@ -46,6 +47,8 @@ export const stringToDOM = (s: string) => {
   return Array.from(temp.childNodes) as Element[];
 };
 
+let wrapperId = 0;
+
 /**
  * Imports a html file as an `Element`
  * @param pathToFile Path relative to `src`
@@ -54,6 +57,8 @@ export const useHTML = (pathToFile: string) => {
   const html = stringToDOM(fs.readFileSync(path.join(src, pathToFile)).toString());
 
   const wrapper = document.createElement('valto-wrapper');
+  wrapper.id = wrapperId.toString();
+  wrapperId++;
 
   // store the path for later (css stuff)
   const valtoPath = document.createElement('valto-path');
@@ -66,6 +71,17 @@ export const useHTML = (pathToFile: string) => {
 
 const render = (element: Element, root: Element) => {
   root.append(element);
+};
+
+const getAllParents = (el: HTMLElement) => {
+  const parents: HTMLElement[] = [];
+  el = el.parentElement!;
+  while (el.parentElement) {
+    parents.unshift(el);
+    el = el.parentElement!;
+  }
+
+  return parents;
 };
 
 export type Route = [Element, string];
@@ -104,11 +120,9 @@ export const useRoutes = (routes: Route[], baseDOM = dom) => {
     const style = localDoc.createElement('style');
 
     // base.html css links
-    const baseStyleLinks = Array.from(
+    for (const link of Array.from(
       localDoc.head.querySelectorAll('link[rel="stylesheet"]')
-    ) as HTMLLinkElement[];
-
-    for (const link of baseStyleLinks) {
+    ) as HTMLLinkElement[]) {
       replaceWithCSS(path.join(src, link.href), style);
       link.remove();
     }
@@ -120,14 +134,18 @@ export const useRoutes = (routes: Route[], baseDOM = dom) => {
       const htmlPath = wrapper.querySelector('valto-path')!.getAttribute('href')!;
 
       // css links
-      for (const child of Array.from(wrapper.childNodes) as HTMLElement[]) {
-        if (child?.tagName?.toLowerCase() !== 'link') continue;
+      for (const link of Array.from(
+        wrapper.querySelectorAll('link[rel="stylesheet"]')
+      ) as HTMLLinkElement[]) {
+        const parentTagNames = getAllParents(link).map((p) => p.tagName.toLowerCase());
+        const parentIds = getAllParents(link).map((p) => p.id);
 
-        const link = child as HTMLLinkElement;
-        if (link?.href && link?.rel === 'stylesheet') {
-          replaceWithCSS(path.join(htmlPath, '../', link.href), style);
-          link.remove();
+        if (wrapper.id !== parentIds[parentTagNames.lastIndexOf('valto-wrapper')]) {
+          continue;
         }
+
+        replaceWithCSS(path.join(htmlPath, '../', link.href), style);
+        link.remove();
       }
 
       // TODO: img
@@ -150,4 +168,20 @@ export const useRoutes = (routes: Route[], baseDOM = dom) => {
     const minimizedHTML = localDom.serialize().replace(/(>\s+<)/g, '><');
     fs.writeFileSync(path.join(dist, route[1], 'index.html'), minimizedHTML);
   }
+
+  // public folder
+  const copyFolder = (from: string, to: string) => {
+    fs.mkdirSync(to, { recursive: true });
+
+    for (const entry of fs.readdirSync(from)) {
+      if (fs.lstatSync(path.join(from, entry)).isDirectory()) {
+        copyFolder(path.join(from, entry), path.join(to, entry));
+      } else {
+        // files
+        fs.copyFileSync(path.join(from, entry), path.join(to, entry));
+      }
+    }
+  };
+
+  copyFolder(publicFolder, path.join(dist));
 };

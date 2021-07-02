@@ -1,30 +1,38 @@
 .btn {
-  background-color: var(--color-light);
   padding: var(--padding-small) var(--padding-normal);
-  border-radius: var(--border-radius);
   display: inline-block;
-  transition: background-color var(--transition);
-  font-weight: 500;
+  text-align: center;
+  transition: var(--transition);
+  transition-property: background-color, color;
+  user-select: none;
 }
 
-.btn.transparent {
-  background-color: transparent;
+.btn.light {
+  background-color: var(--color-light);
 }
 
-.btn.accent {
-  background-color: var(--color-accent);
+.btn.ghost {
+  background-color: var(--color-background);
+  padding: calc(var(--padding-small) - 0.4rem) calc(var(--padding-normal) - 0.4rem);
+  border: 0.4rem dashed var(--color-light);
+}
+
+.btn.dark {
+  background-color: var(--color-text);
+  color: var(--color-background);
 }
 
 @media (hover: hover) {
   .btn:hover {
-    background-color: var(--color-accent);
-  }
-
-  .btn.transparent:hover {
     background-color: var(--color-light);
   }
 
-  .btn.btn.accent:hover {
-    background-color: var(--color-accent-dark);
+  .btn.light:hover {
+    background-color: var(--color-accent);
+    color: var(--color-background);
+  }
+
+  .btn.dark:hover {
+    background-color: var(--color-accent);
   }
 }

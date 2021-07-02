@@ -3,12 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.useRoutes = exports.useHTML = exports.stringToDOM = exports.getDocument = exports.getWindow = exports.getDOM = exports.dev = exports.dist = exports.src = void 0;
+exports.useRoutes = exports.useHTML = exports.stringToDOM = exports.getDocument = exports.getWindow = exports.getDOM = exports.dev = exports.publicFolder = exports.dist = exports.src = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const jsdom_1 = require("jsdom");
 exports.src = path_1.default.join(process.cwd(), 'src');
 exports.dist = path_1.default.join(process.cwd(), 'build');
+exports.publicFolder = path_1.default.join(process.cwd(), 'public');
 exports.dev = true;
 const dom = new jsdom_1.JSDOM('');
 const { window } = dom;
@@ -32,9 +33,12 @@ const stringToDOM = (s) => {
     return Array.from(temp.childNodes);
 };
 exports.stringToDOM = stringToDOM;
+let wrapperId = 0;
 const useHTML = (pathToFile) => {
     const html = exports.stringToDOM(fs_1.default.readFileSync(path_1.default.join(exports.src, pathToFile)).toString());
     const wrapper = document.createElement('valto-wrapper');
+    wrapper.id = wrapperId.toString();
+    wrapperId++;
     const valtoPath = document.createElement('valto-path');
     valtoPath.setAttribute('href', path_1.default.join(exports.src, pathToFile));
     wrapper.append(valtoPath, ...html);
@@ -44,8 +48,16 @@ exports.useHTML = useHTML;
 const render = (element, root) => {
     root.append(element);
 };
+const getAllParents = (el) => {
+    const parents = [];
+    el = el.parentElement;
+    while (el.parentElement) {
+        parents.unshift(el);
+        el = el.parentElement;
+    }
+    return parents;
+};
 const useRoutes = (routes, baseDOM = dom) => {
-    var _a;
     fs_1.default.mkdirSync(exports.dist, { recursive: true });
     for (const file of fs_1.default.readdirSync(exports.dist)) {
         fs_1.default.rmSync(path_1.default.join(exports.dist, file), { recursive: true });
@@ -64,22 +76,21 @@ const useRoutes = (routes, baseDOM = dom) => {
         const localDoc = localDom.window.document;
         render(route[0], localDoc.body);
         const style = localDoc.createElement('style');
-        const baseStyleLinks = Array.from(localDoc.head.querySelectorAll('link[rel="stylesheet"]'));
-        for (const link of baseStyleLinks) {
+        for (const link of Array.from(localDoc.head.querySelectorAll('link[rel="stylesheet"]'))) {
             replaceWithCSS(path_1.default.join(exports.src, link.href), style);
             link.remove();
         }
         const wrappers = Array.from(localDoc.querySelectorAll('valto-wrapper'));
         for (const wrapper of wrappers) {
             const htmlPath = wrapper.querySelector('valto-path').getAttribute('href');
-            for (const child of Array.from(wrapper.childNodes)) {
-                if (((_a = child === null || child === void 0 ? void 0 : child.tagName) === null || _a === void 0 ? void 0 : _a.toLowerCase()) !== 'link')
+            for (const link of Array.from(wrapper.querySelectorAll('link[rel="stylesheet"]'))) {
+                const parentTagNames = getAllParents(link).map((p) => p.tagName.toLowerCase());
+                const parentIds = getAllParents(link).map((p) => p.id);
+                if (wrapper.id !== parentIds[parentTagNames.lastIndexOf('valto-wrapper')]) {
                     continue;
-                const link = child;
-                if ((link === null || link === void 0 ? void 0 : link.href) && (link === null || link === void 0 ? void 0 : link.rel) === 'stylesheet') {
-                    replaceWithCSS(path_1.default.join(htmlPath, '../', link.href), style);
-                    link.remove();
                 }
+                replaceWithCSS(path_1.default.join(htmlPath, '../', link.href), style);
+                link.remove();
             }
             wrapper.querySelector('valto-path').remove();
             wrapper.replaceWith(...wrapper.childNodes);
@@ -94,5 +105,17 @@ const useRoutes = (routes, baseDOM = dom) => {
         const minimizedHTML = localDom.serialize().replace(/(>\s+<)/g, '><');
         fs_1.default.writeFileSync(path_1.default.join(exports.dist, route[1], 'index.html'), minimizedHTML);
     }
+    const copyFolder = (from, to) => {
+        fs_1.default.mkdirSync(to, { recursive: true });
+        for (const entry of fs_1.default.readdirSync(from)) {
+            if (fs_1.default.lstatSync(path_1.default.join(from, entry)).isDirectory()) {
+                copyFolder(path_1.default.join(from, entry), path_1.default.join(to, entry));
+            }
+            else {
+                fs_1.default.copyFileSync(path_1.default.join(from, entry), path_1.default.join(to, entry));
+            }
+        }
+    };
+    copyFolder(exports.publicFolder, path_1.default.join(exports.dist));
 };
 exports.useRoutes = useRoutes;

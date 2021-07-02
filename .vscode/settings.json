@@ -12,7 +12,15 @@
       "splitTerminals": [
         {
           "name": "test",
-          "commands": ["cd test"]
+          "commands": ["cd test", "npm run dev"]
+        }
+      ]
+    },
+    {
+      "splitTerminals": [
+        {
+          "name": "server",
+          "commands": ["cd test", "npm run serve"]
         }
       ]
     }

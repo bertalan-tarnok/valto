@@ -1,13 +1,13 @@
 import { useHTML } from 'valto';
 
-export const button = ({ text = 'BUTTON', href = '/', style = '' }) => {
+export const button = (btn) => {
   const html = useHTML('button/button.html');
   const a = html.querySelector('a');
 
-  if (style) a.classList.add(style);
+  if (btn.getAttribute('type')) a.classList.add(btn.getAttribute('type'));
 
-  a.href = href;
-  a.textContent = text;
+  a.href = btn.getAttribute('href') || '';
+  a.textContent = btn.textContent || '';
 
   return html;
 };

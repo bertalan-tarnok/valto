@@ -1,10 +1,38 @@
 nav {
-  padding: var(--padding-big) var(--padding-large);
-  display: flex;
-  justify-content: flex-end;
+  padding: var(--padding-big) var(--padding-large) var(--padding-normal) var(--padding-large);
 }
 
 nav a {
-  margin: 0 var(--padding-small);
-  font-weight: 500;
+  display: flex;
+  align-items: center;
+  width: fit-content;
+}
+
+nav svg {
+  width: var(--padding-normal);
+  height: var(--padding-normal);
+}
+
+nav svg path {
+  fill: var(--color-text);
+  transition: fill var(--transition);
+}
+
+nav span {
+  margin: 0 var(--padding-normal);
+  transition: color var(--transition);
+}
+
+@media (hover: hover) {
+  nav a:hover * {
+    color: var(--color-mid);
+    fill: var(--color-mid);
+    cursor: pointer;
+  }
+}
+
+@media (max-width: 800px) {
+  nav {
+    padding: var(--padding-big) var(--padding-big) var(--padding-normal) var(--padding-big);
+  }
 }
