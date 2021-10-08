@@ -1,35 +1,23 @@
 {
+  "files.exclude": {
+    "*/node_modules": true
+  },
   "restoreTerminals.terminals": [
     {
       "splitTerminals": [
         {
           "name": "valto",
-          "commands": ["npm run dev"]
+          "commands": ["cd ./valto", "npm run dev"]
         }
       ]
     },
     {
       "splitTerminals": [
         {
-          "name": "test",
-          "commands": ["cd test", "npm run dev"]
-        }
-      ]
-    },
-    {
-      "splitTerminals": [
-        {
-          "name": "server",
-          "commands": ["cd test", "npm run serve"]
+          "name": "app",
+          "commands": ["cd ./app"]
         }
       ]
     }
-  ],
-  "files.exclude": {
-    "**/node_modules": true,
-    "**/package-lock.json": true
-  },
-  "todo-tree.tree.showBadges": true,
-  "todo-tree.tree.showCountsInTree": false,
-  "cssVariables.lookupFiles": ["./test/src/base.css"]
+  ]
 }
