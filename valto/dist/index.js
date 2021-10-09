@@ -28,13 +28,11 @@ var copyRecursiveSync = function (src, dest) {
     }
 };
 var build = function (cfg) {
-    // const base = new JSDOM(fs.readFileSync(path.join(cfg.src, cfg.pages!, '_base.html')));
-    // const baseDoc = base.window.document;
-    // parse(baseDoc.body, cfg);
-    fs_1.default.rmSync(cfg.out, { recursive: true });
+    if (fs_1.default.existsSync(cfg.out) && fs_1.default.statSync(cfg.out).isDirectory()) {
+        fs_1.default.rmSync(cfg.out, { recursive: true });
+    }
     fs_1.default.mkdirSync(cfg.out);
     copyRecursiveSync(cfg.static, path_1.default.join(cfg.out));
-    // fs.writeFileSync(path.join(cfg.out, 'index.html'), base.serialize());
     createPages(cfg);
     (0, esbuild_1.buildSync)({
         entryPoints: [path_1.default.join(cfg.src, 'index.ts')],

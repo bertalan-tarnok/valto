@@ -26,17 +26,13 @@ const copyRecursiveSync = (src: string, dest: string) => {
 };
 
 export const build = (cfg: config) => {
-  // const base = new JSDOM(fs.readFileSync(path.join(cfg.src, cfg.pages!, '_base.html')));
-  // const baseDoc = base.window.document;
+  if (fs.existsSync(cfg.out) && fs.statSync(cfg.out).isDirectory()) {
+    fs.rmSync(cfg.out, { recursive: true });
+  }
 
-  // parse(baseDoc.body, cfg);
-
-  fs.rmSync(cfg.out, { recursive: true });
   fs.mkdirSync(cfg.out);
-
   copyRecursiveSync(cfg.static, path.join(cfg.out));
 
-  // fs.writeFileSync(path.join(cfg.out, 'index.html'), base.serialize());
   createPages(cfg);
 
   esbuild({
