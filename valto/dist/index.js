@@ -32,7 +32,9 @@ var build = function (cfg) {
         fs_1.default.rmSync(cfg.out, { recursive: true });
     }
     fs_1.default.mkdirSync(cfg.out);
-    copyRecursiveSync(cfg.static, path_1.default.join(cfg.out));
+    if (cfg.static) {
+        copyRecursiveSync(cfg.static, path_1.default.join(cfg.out));
+    }
     createPages(cfg);
     (0, esbuild_1.buildSync)({
         entryPoints: [path_1.default.join(cfg.src, 'index.ts')],

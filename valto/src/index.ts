@@ -31,7 +31,10 @@ export const build = (cfg: config) => {
   }
 
   fs.mkdirSync(cfg.out);
-  copyRecursiveSync(cfg.static, path.join(cfg.out));
+
+  if (cfg.static) {
+    copyRecursiveSync(cfg.static, path.join(cfg.out));
+  }
 
   createPages(cfg);
 

@@ -3,5 +3,5 @@ export interface config {
   out: string;
 
   pages: string;
-  static: string;
+  static: string | null;
 }
