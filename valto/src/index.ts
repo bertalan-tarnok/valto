@@ -60,7 +60,7 @@ const createPages = (cfg: config) => {
 
     baseDoc.body.innerHTML += page;
 
-    parse(baseDoc.body, cfg);
+    parse(baseDoc, cfg);
 
     let route: string;
 
@@ -71,11 +71,11 @@ const createPages = (cfg: config) => {
       fs.mkdirSync(path.join(cfg.out, f.replace(/\.html/g, '')));
     }
 
-    fs.writeFileSync(path.join(cfg.out, route), baseDOM.serialize());
+    fs.writeFileSync(path.join(cfg.out, route), baseDOM.serialize().replace(/>\s+</g, '><'));
   }
 };
 
-const parse = (root: HTMLElement, cfg: config) => {
+const parse = (root: Document, cfg: config) => {
   while (root.querySelectorAll('import').length > 0) {
     const i = root.querySelectorAll('import')[0];
 
@@ -89,13 +89,35 @@ const parse = (root: HTMLElement, cfg: config) => {
     if (root.querySelector(`template#${name}`)) continue;
 
     const file = fs.readFileSync(path.join(cfg.src, from)).toString();
-    const tem = doc.createElement('div');
 
-    tem.innerHTML = file;
-    tem.id = name;
-    tem.setAttribute('x-valto-replace-tem', '');
+    // if (isStatic) {
+    //   for (const el of Array.from(root.querySelectorAll(name))) {
+    //     const temp = doc.createElement('div');
+    //     temp.innerHTML = file;
+    //     el.replaceWith(...Array.from(temp.childNodes));
+    //   }
+    //   continue;
+    // }
 
-    root.prepend(tem);
+    const div = doc.createElement('div');
+
+    div.innerHTML = file;
+    div.id = name;
+    div.setAttribute('x-valto-replace-tem', '');
+
+    if (div.firstElementChild?.tagName.toLowerCase() === 'valto-static') {
+      for (const s of Array.from(root.querySelectorAll(name))) {
+        s.outerHTML = div.firstElementChild.innerHTML;
+      }
+      continue;
+    }
+
+    root.body.prepend(div);
+  }
+
+  for (const t of Array.from(root.querySelectorAll(`valto-head`))) {
+    root.head.append(...Array.from(t.childNodes));
+    t.remove();
   }
 
   for (const t of Array.from(root.querySelectorAll(`div[x-valto-replace-tem]`))) {
