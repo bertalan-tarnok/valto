@@ -1,0 +1,56 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+  font-size: 16px;
+  -webkit-tap-highlight-color: transparent;
+  font-weight: 500;
+}
+
+.app {
+  display: grid;
+  width: max-content;
+  gap: 40px;
+  margin: auto;
+  margin-top: 48px;
+}
+
+.app div {
+  display: flex;
+  gap: 24px;
+}
+
+h1 {
+  font-size: 48px;
+  font-weight: 900;
+}
+
+.counter button {
+  padding: 12px 0;
+  width: 180px;
+  border: 0;
+  border-radius: 8px;
+  background-color: #f0f0f0;
+  cursor: pointer;
+  transition: 200ms ease;
+  transition-property: background-color, color;
+}
+
+.counter button:hover {
+  background-color: #3fb2ff;
+  color: white;
+}
+
+.counter button:active {
+  background-color: #3aa7f0;
+  color: white;
+}
+
+@media (max-width: 800px) {
+  .app div {
+    display: grid;
+  }
+}

@@ -1,130 +1,64 @@
-import fs from 'fs';
-import path from 'path';
-
-import { JSDOM } from 'jsdom';
-import { buildSync as esbuild } from 'esbuild';
-import { config } from './config';
-
-const doc = new JSDOM('').window.document;
-
-const copyRecursiveSync = (src: string, dest: string) => {
-  const exists = fs.existsSync(src);
-  if (!exists) return;
-
-  const stats = fs.statSync(src);
-  const isDirectory = stats.isDirectory();
-
-  if (isDirectory) {
-    if (!fs.existsSync(dest)) fs.mkdirSync(dest);
-
-    for (const f of fs.readdirSync(src)) {
-      copyRecursiveSync(path.join(src, f), path.join(dest, f));
-    }
-  } else {
-    fs.copyFileSync(src, dest);
-  }
+type Tag = {
+  attrs?: Record<string, string>;
+  ins?: HTMLElement | HTMLElement[];
+  text?: string;
 };
 
-export const build = (cfg: config) => {
-  if (fs.existsSync(cfg.out) && fs.statSync(cfg.out).isDirectory()) {
-    fs.rmSync(cfg.out, { recursive: true });
+export const tag = <T extends keyof HTMLElementTagNameMap>(
+  tagn: T,
+  t: Tag = { attrs: {}, ins: [], text: "" }
+) => {
+  const el = document.createElement(tagn);
+
+  for (const key in t.attrs) {
+    el.setAttribute(key, t.attrs[key]);
   }
 
-  fs.mkdirSync(cfg.out);
+  el.textContent = t.text!;
 
-  if (cfg.static) {
-    copyRecursiveSync(cfg.static, path.join(cfg.out));
+  if (Array.isArray(t.ins)) {
+    el.append(...t.ins);
+  } else if (t.ins) {
+    el.append(t.ins);
   }
 
-  createPages(cfg);
-
-  esbuild({
-    entryPoints: [path.join(cfg.src, 'index.ts')],
-    loader: { '.ts': 'ts' },
-    bundle: true,
-    outfile: path.join(cfg.out, 'bundle.js'),
-  });
+  return el;
 };
 
-const createPages = (cfg: config) => {
-  if (!cfg.pages) return;
+export const state = <T>(value: T) => {
+  const subs: (() => void)[] = [];
 
-  const baseFile = fs.readFileSync(path.join(cfg.pages, '_base.html'));
+  const get = () => value;
 
-  for (const f of fs.readdirSync(cfg.pages)) {
-    if (!f.endsWith('.html') || f === '_base.html') continue;
+  const set = (newValue: T) => {
+    value = newValue;
 
-    const baseDOM = new JSDOM(baseFile);
-    const baseDoc = baseDOM.window.document;
-    const page = fs.readFileSync(path.join(cfg.pages, f)).toString();
-
-    baseDoc.body.innerHTML += page;
-
-    parse(baseDoc, cfg);
-
-    let route: string;
-
-    if (f === 'index.html') {
-      route = f;
-    } else {
-      route = path.join(f.replace(/\.html/g, ''), 'index.html');
-      fs.mkdirSync(path.join(cfg.out, f.replace(/\.html/g, '')));
+    for (const s of subs) {
+      s();
     }
+  };
 
-    fs.writeFileSync(path.join(cfg.out, route), baseDOM.serialize().replace(/>\s+</g, '><'));
-  }
+  const sub = (f: () => void, onInit = false) => {
+    subs.push(f);
+
+    if (onInit) f();
+  };
+
+  return { get, set, sub };
 };
 
-const parse = (root: Document, cfg: config) => {
-  while (root.querySelectorAll('import').length > 0) {
-    const i = root.querySelectorAll('import')[0];
+let componentID = 0;
 
-    if (!i.hasAttribute('from') || i.attributes.length < 1) continue;
+export const component = (f: (self: HTMLElement) => void) => {
+  class X extends HTMLElement {
+    constructor() {
+      super();
 
-    const name = i.attributes[0].name;
-    const from = i.getAttribute('from')!;
-
-    i.remove();
-
-    if (root.querySelector(`template#${name}`)) continue;
-
-    const file = fs.readFileSync(path.join(cfg.src, from)).toString();
-
-    // if (isStatic) {
-    //   for (const el of Array.from(root.querySelectorAll(name))) {
-    //     const temp = doc.createElement('div');
-    //     temp.innerHTML = file;
-    //     el.replaceWith(...Array.from(temp.childNodes));
-    //   }
-    //   continue;
-    // }
-
-    const div = doc.createElement('div');
-
-    div.innerHTML = file;
-    div.id = name;
-    div.setAttribute('x-valto-replace-tem', '');
-
-    if (div.firstElementChild?.tagName.toLowerCase() === 'valto-static') {
-      for (const s of Array.from(root.querySelectorAll(name))) {
-        s.outerHTML = div.firstElementChild.innerHTML;
-      }
-      continue;
+      f(this);
     }
-
-    root.body.prepend(div);
   }
 
-  for (const t of Array.from(root.querySelectorAll(`valto-head`))) {
-    root.head.append(...Array.from(t.childNodes));
-    t.remove();
-  }
+  customElements.define(`vlt-${(componentID++).toString(16)}`, X);
 
-  for (const t of Array.from(root.querySelectorAll(`div[x-valto-replace-tem]`))) {
-    const tem = doc.createElement('template');
-    tem.innerHTML = t.innerHTML;
-    tem.id = t.id;
-
-    t.replaceWith(tem);
-  }
+  return new X() as HTMLElement;
 };
